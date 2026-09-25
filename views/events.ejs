@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/style.css">
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+  </head>
+  <body>
+    <%- include('partials/header') %>
+    <h1><%= title %></h1>
+    <ul>
+      <% if (events.length == 0) { %>
+        <p> No events </p>
+      <% } else { %>
+        <% events.forEach(event => { %>
+          <li><%= event.title %></li>
+        <% }); %>
+      <% } %>
+    </ul>
+  </body>
+</html>

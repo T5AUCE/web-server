@@ -1,9 +1,15 @@
 import express from "express";
 import morgan from "morgan";
+import mongoose from "mongoose";
 import entriesRouter from "./routes/entries.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+await mongoose.connect(
+  process.env.MONGODB_URI ||
+    "mongodb://dev:devpassword@mongo:27017/devdb?authSource=admin",
+);
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -33,4 +39,3 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
-// work in progress

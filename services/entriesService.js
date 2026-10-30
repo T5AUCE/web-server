@@ -8,21 +8,24 @@ import {
 } from "../repositories/entriesRepository.js";
 import { toEntryDto } from "../dtos/entryDto.js";
 
-function isOnlyWhitespace(str) {
-  return str.trim().length === 0;
-}
-
 const validateEntry = ({ title, body }) => {
-  if (!title || !body)
+  const trimmedTitle = (title || "").trim();
+  const trimmedBody = (body || "").trim();
+  if (!trimmedTitle || !trimmedBody)
     return Err({ status: 400, message: "title and body are required" });
-  if (isOnlyWhitespace(String(title)) || isOnlyWhitespace(String(body))) {
-    return Err({ status: 400, message: "title and body cannot be whitespace" });
-  }
-
-  return Ok({ title, body });
+  return Ok({ title: trimmedTitle, body: trimmedBody });
 };
 
-export const listEntries = async () => (await getAll()).map(toEntryDto);
+export const listEntries = async () =>
+  (await getAll())
+    .map(toEntryDto)
+    .sort((a, b) => a.title.localeCompare(b.title));
+
+export const getEntry = async (id) => {
+  const existing = await findById(id);
+  if (!existing) return Err({ status: 404, message: "Entry not found" });
+  return Ok(toEntryDto(existing));
+};
 
 export const createEntry = async (data) => {
   const result = validateEntry(data);
@@ -44,4 +47,10 @@ export const deleteEntry = async (id) => {
   if (!existing) return Err({ status: 404, message: "Entry not found" });
   await removeById(id);
   return Ok(null);
+};
+
+export const toggleFavorite = async (id) => {
+  const existing = await findById(id);
+  if (!existing) return Err({ status: 404, message: "Entry not found" });
+  return Ok(toEntryDto(await updateById(id, { favorite: !existing.favorite })));
 };
